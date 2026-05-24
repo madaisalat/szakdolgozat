@@ -5,12 +5,23 @@
 #include <string>
 #include <vector>
 
+struct CorrectScore {
+    int homeGoals;
+    int awayGoals;
+    double probability;
+};
+
 struct Prediction {
     double homeWinProb;
     double drawProb;
     double awayWinProb;
     double expectedHomeGoals;
     double expectedAwayGoals;
+
+    double expectedTotalGoals;
+    double over25Prob;
+    double bttsProb;
+    std::vector<CorrectScore> topScores;
 };
 
 class Predictor {

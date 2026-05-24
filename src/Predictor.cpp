@@ -58,7 +58,9 @@ Prediction Predictor::predict(const string& homeName, const string& awayName) {
     if (lambda < 0.1) { lambda = 0.1; }
     if (mu < 0.1) { mu = 0.1; }
 
-    Prediction res = {0, 0, 0, lambda, mu};
+    Prediction res = {0.0, 0.0, 0.0, lambda, mu, (lambda + mu), 0.0, 0.0, {}};
+    vector<CorrectScore> allScores;
+    allScores.reserve(81);
 
     for (int i = 0; i <= 8; ++i) {
         for (int u = 0; u <= 8; ++u) {
@@ -67,7 +69,24 @@ Prediction Predictor::predict(const string& homeName, const string& awayName) {
             if (i > u) res.homeWinProb += p;
             else if (i == u) res.drawProb += p;
             else res.awayWinProb += p;
+
+            if ((i + u) > 2) {
+                res.over25Prob += p;
+            }
+            if (i > 0 && u > 0) {
+                res.bttsProb += p;
+            }
+            allScores.push_back({i, u, p});
         }
     }
+    
+    sort(allScores.begin(), allScores.end(), [](const CorrectScore& a, const CorrectScore& b) {
+        return a.probability > b.probability;
+    });
+
+    for (int i = 0; i < 3; ++i) {
+        res.topScores.push_back(allScores[i]);
+    }
+
     return res;
 }

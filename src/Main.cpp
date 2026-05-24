@@ -11,7 +11,7 @@ Database db;
 
 void handleLoadData() {
     string filename;
-    cout << "\nFilename2 (e.g. E0.csv): ";
+    cout << "\nFilename (e.g. E0.csv): ";
     cin >> filename;
     db.loadFromCSV("data/" + filename);
 }
@@ -20,7 +20,7 @@ void handleViewTeams() {
     const auto& teams = db.getTeams();
 
     if (teams.empty()) {
-        cout << "\n[!] Database is empty!" << endl;
+        cout << "\n[!] Database is empty! You can download data from https://football-data.co.uk/" << endl;
         return;
     }
 
@@ -42,7 +42,7 @@ void handleViewTeams() {
 
 void handleRunPrediction() {
     if (db.getTeams().empty()) {
-        cout << "\n[!] No data for prediction!" << endl;
+        cout << "\n[!] No data for prediction! You can download data from https://football-data.co.uk/" << endl;
         return;
     }
 
@@ -71,6 +71,18 @@ void handleRunPrediction() {
     cout << "Away win (2): " << setw(6) << (res.awayWinProb * 100) << "%" << endl;
     cout << "--------------------------------------------" << endl;
     cout << "Expected goals (xG): " << res.expectedHomeGoals << " - " << res.expectedAwayGoals << endl;
+    cout << "Expected total goals: " << res.expectedTotalGoals << endl;
+    cout << "--------------------------------------------" << endl;
+    cout << "Over 2.5 goals:       " << setw(6) << (res.over25Prob * 100) << "%" << endl;
+    cout << "Under 2.5 goals:      " << setw(6) << ((1.0 - res.over25Prob) * 100) << "%" << endl;
+    cout << "Both teams to score:  " << setw(6) << (res.bttsProb * 100) << "%" << endl;
+    cout << "--------------------------------------------" << endl;
+    cout << "TOP 3 MOST LIKELY CORRECT SCORES:" << endl;
+    for (size_t i = 0; i < res.topScores.size(); ++i) {
+        cout << i + 1 << ". " << home << " " 
+             << res.topScores[i].homeGoals << " - " << res.topScores[i].awayGoals << " " << away
+             << " (" << (res.topScores[i].probability * 100) << "%)" << endl;
+    }
     cout << "============================================" << endl;
 }
 
@@ -105,7 +117,7 @@ int main() {
                 running = false; 
                 break;
             default: 
-                cout << "\n[!] Invalid option (1-4)!" << endl;
+                cout << "\n[!] Invalid option (1-3)!" << endl;
         }
     }
     return 0;
