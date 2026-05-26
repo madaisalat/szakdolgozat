@@ -14,7 +14,11 @@ private:
 
     long dateConverter(std::string dateStr);
 public:
+    Database() = default;
     ~Database();
+    Database(const Database& other);
+    Database& operator=(const Database& other);
+    void clear();
 
     void loadFromCSV(std::string filename);
     void calculateBaselineParameters();
@@ -23,6 +27,7 @@ public:
     Team* getOrCreateTeam(std::string name);
 
     const std::vector<Match>& getMatches() const { return allMatches; }
+    std::vector<Match>& getMatches() { return allMatches; }
     const std::map<std::string, Team*>& getTeams() const { return teams; }
 };
 

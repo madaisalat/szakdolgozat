@@ -13,6 +13,39 @@ Database::~Database() {
         delete teamPtr;
     }
 }
+Database::Database(const Database& other) {
+    this->allMatches = other.allMatches;
+    for (auto const& [name, originalTeamPtr] : other.teams) {
+        if (originalTeamPtr != nullptr) {
+            this->teams[name] = new Team(*originalTeamPtr);
+        }
+    }
+}
+
+Database& Database::operator=(const Database& other) {
+    if (this != &other) {
+        for (auto const& [name, teamPtr] : teams) {
+            delete teamPtr;
+        }
+        teams.clear();
+
+        this->allMatches = other.allMatches;
+        for (auto const& [name, originalTeamPtr] : other.teams) {
+            if (originalTeamPtr != nullptr) {
+                this->teams[name] = new Team(*originalTeamPtr);
+            }
+        }
+    }
+    return *this;
+}
+
+void Database::clear() {
+    for (auto const& [name, teamPtr] : teams) {
+        delete teamPtr;
+    }
+    teams.clear();
+    allMatches.clear();
+}
 
 bool Database::teamExists(string name) const {
     return teams.find(name) != teams.end();
@@ -82,10 +115,6 @@ void Database::loadFromCSV(string filename) {
     string line;
     getline(file, line);
 
-    long threeYearsInSeconds = 3L * 365 * 24 * 60 * 60;
-    long currentTime = time(nullptr);
-    long cutoffTime = currentTime - threeYearsInSeconds;
-
     while (getline(file, line)) {
         stringstream ss(line);
         string cell;
@@ -99,8 +128,6 @@ void Database::loadFromCSV(string filename) {
 
         string dateStr = row[1];
         long ts = dateConverter(dateStr);
-
-        if (ts < cutoffTime) continue;
 
         string homeName = row[3];
         string awayName = row[4];

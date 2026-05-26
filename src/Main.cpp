@@ -4,6 +4,7 @@
 #include <iomanip>
 #include "Database.h"   
 #include "Predictor.h"
+#include "Backtester.h"
 
 using namespace std;
 
@@ -16,6 +17,15 @@ void handleLoadData() {
     db.loadFromCSV("data/" + filename);
 }
 
+void handleClearDatabase() {
+    if (db.getTeams().empty()) {
+        cout << "\n[!] Database is already empty." << endl;
+        return;
+    }
+    db.clear();
+    cout << "\n[!] Database cleared!" << endl;
+}
+
 void handleViewTeams() {
     const auto& teams = db.getTeams();
 
@@ -25,7 +35,7 @@ void handleViewTeams() {
     }
 
     cout << "\n====================================================" << endl;
-    cout << "          List of teams (ABC)" << endl;
+    cout << "               List of teams (ABC)" << endl;
     cout << "====================================================" << endl;
     cout << left << setw(25) << "Team name" 
          << right << setw(10) << "Elo" 
@@ -85,6 +95,62 @@ void handleRunPrediction() {
     }
     cout << "============================================" << endl;
 }
+void handleRunBacktest() {
+    if (db.getTeams().empty()) {
+        cout << "\n[!] Load database (1) before running backtest!" << endl;
+        return;
+    }
+
+    cout << "\n==============================================" << endl;
+    cout << "        SELECT BACKTEST VALIDATION MODE" << endl;
+    cout << "==============================================" << endl;
+    cout << "1. Stochastic Backtest (Dice Roll)" << endl;
+    cout << "2. Deterministic Backtest (Most Likely Outcomes)" << endl;
+    cout << "3. Rolling Window Backtest (Iterative Learning)" << endl;
+    cout << "----------------------------------------------" << endl;
+    cout << "Choose an option (1-3): ";
+    
+    int choice;
+    if (!(cin >> choice) || choice < 1 || choice > 3) {
+        cout << "\n[!] Invalid selection. Returning to menu." << endl;
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        return;
+    }
+
+    string fixturesFilename;
+    cout << "Fixtures filename (e.g. PL25.txt): ";
+    cin >> fixturesFilename;
+    string fixturesPath = "data/" + fixturesFilename;
+
+    Backtester backtester(db);
+
+    switch (choice) {
+        case 1:
+            cout << "\n[i] Starting Stochastic Backtest..." << endl;
+            backtester.runBacktest(fixturesPath);
+            break;
+            
+        case 2:
+            cout << "\n[i] Starting Deterministic Backtest..." << endl;
+            backtester.runDeterministicBacktest(fixturesPath);
+            break;
+            
+        case 3: {
+            string resultsFilename;
+            cout << "Real results filename (e.g. E25.csv): ";
+            cin >> resultsFilename;
+            string resultsPath = "data/" + resultsFilename;
+            
+            cout << "\n[i] Starting Rolling Window Backtest..." << endl;
+            backtester.runRollingBacktest(fixturesPath, resultsPath);
+            break;
+        }
+        
+        default:
+            break;
+    }
+}
 
 int main() {
     int choice;
@@ -97,6 +163,8 @@ int main() {
         cout << "1. Load data (CSV)" << endl;
         cout << "2. Leaderboard (ELO)" << endl;
         cout << "3. Match prediction" << endl;
+        cout << "4. Run Backtest Simulation" << endl;
+        cout << "5. Clear Database" << endl;
         cout << "0. Quit" << endl;
         cout << "------------------------------------" << endl;
         cout << "Choose an option: ";
@@ -112,12 +180,14 @@ int main() {
             case 1: handleLoadData(); break;
             case 2: handleViewTeams(); break;
             case 3: handleRunPrediction(); break;
+            case 4: handleRunBacktest(); break;
+            case 5: handleClearDatabase(); break;
             case 0: 
                 cout << "\nClosing..." << endl;
                 running = false; 
                 break;
             default: 
-                cout << "\n[!] Invalid option (1-3)!" << endl;
+                cout << "\n[!] Invalid option (1-5)!" << endl;
         }
     }
     return 0;
