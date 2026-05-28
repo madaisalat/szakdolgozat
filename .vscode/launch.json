@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/adamtalasi/Documents/szakdolgozat",
-      "program": "/Users/adamtalasi/Documents/szakdolgozat/build/Debug/outDebug"
+      "cwd": "/Users/adamtalasi/Documents/szakdolgozat/src",
+      "program": "/Users/adamtalasi/Documents/szakdolgozat/src/build/Debug/outDebug"
     }
   ]
 }

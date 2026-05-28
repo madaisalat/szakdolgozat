@@ -6,6 +6,7 @@ A cross-platform C++ application for football match outcome prediction.
 - **Windows**: Install [Visual Studio](https://visualstudio.microsoft.com/) (with C++ Desktop development) or [MinGW](https://www.mingw-w64.org/).
 - **macOS**: Install Xcode Command Line Tools (`xcode-select --install`).
 - **Linux**: `sudo apt install build-essential cmake`
+- **Linux**: `sudo apt install build-essential`
 
 ## How to Compile
 
