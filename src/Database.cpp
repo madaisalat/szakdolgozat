@@ -62,12 +62,16 @@ void Database::calculateBaselineParameters() {
     }
 
     double leagueAverage = totalGoals / (totalMatches * 2.0);
+    if (leagueAverage <= 0) leagueAverage = 1.0;
 
     for (auto& [name, teamPtr] : teams) {
         if (teamPtr->getMatchesPlayed() == 0) { continue; }
 
         double teamAvgScored = static_cast<double>(teamPtr->getGoalsScored()) / teamPtr->getMatchesPlayed(); 
         double teamAvgConceded = static_cast<double>(teamPtr->getGoalsConceded()) / teamPtr->getMatchesPlayed();
+
+        if (teamAvgScored < 0.2) teamAvgScored = 0.2;
+        if (teamAvgConceded < 0.2) teamAvgConceded = 0.2;
 
         double attack = log(teamAvgScored / leagueAverage);
         double defense = log(teamAvgConceded / leagueAverage);

@@ -55,8 +55,11 @@ Prediction Predictor::predict(const string& homeName, const string& awayName) {
     double lambda = baseLambda + eloAdjustment;
     double mu = baseMu - eloAdjustment;
 
-    if (lambda < 0.1) { lambda = 0.1; }
-    if (mu < 0.1) { mu = 0.1; }
+    // Prevent infinite or negative expectations and clamp to realistic maximums
+    if (!isfinite(lambda) || lambda < 0.1) lambda = 0.1;
+    if (!isfinite(mu) || mu < 0.1) mu = 0.1;
+    if (lambda > 5.0) lambda = 5.0; 
+    if (mu > 5.0) mu = 5.0;
 
     Prediction res = {0.0, 0.0, 0.0, lambda, mu, (lambda + mu), 0.0, 0.0, {}};
     vector<CorrectScore> allScores;
